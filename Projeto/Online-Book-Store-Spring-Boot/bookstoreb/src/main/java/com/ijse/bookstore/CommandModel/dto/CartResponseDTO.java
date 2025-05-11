@@ -1,7 +1,6 @@
 package com.ijse.bookstore.CommandModel.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ijse.bookstore.CommandModel.dto.CartItemsResponseDTO;
 import lombok.Data;
 
 import java.util.List;

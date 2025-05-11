@@ -10,11 +10,6 @@ import com.ijse.bookstore.CommandModel.entity.Order;
 import com.ijse.bookstore.CommandModel.entity.OrderDetails;
 import com.ijse.bookstore.CommandModel.producer.MessageProducer;
 import com.ijse.bookstore.CommandModel.repository.OrderRepository;
-import com.ijse.bookstore.CommandModel.dto.UserResponseDTO;
-import com.ijse.bookstore.CommandModel.dto.CartItemsResponseDTO;
-import com.ijse.bookstore.CommandModel.dto.CartResponseDTO;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -87,11 +83,31 @@ public class OrderServiceImpl implements OrderService {
 
         try {
             var orderShippingConfirmationJson = objectMapper.writeValueAsString(orderShippingConfirmation);
-            messageProducer.sendMessage(orderShippingConfirmationJson);
+            messageProducer.sendOrderToShipping(orderShippingConfirmationJson);
         } catch (JsonProcessingException e) {
-            log.error("Error happened on sending object on rabbit mq");
+            log.error("Error happened on sending object on rabbit mq to shipping");
             throw new RuntimeException(e);
         }
+
+        OrderQueryDTO orderQueryDTO = new OrderQueryDTO();
+        orderQueryDTO.setOrderId(order.getId());
+        orderQueryDTO.setUserId(order.getUserId());
+        orderQueryDTO.setOrderDate(order.getOrderDate());
+        orderQueryDTO.setTotalPrice(order.getTotalPrice());
+
+        // converter os detalhes para DTOs
+        List<OrderDetailsQueryDTO> detailsDTOs = order.getOrderDetails().stream().map(detail -> {
+            OrderDetailsQueryDTO dto = new OrderDetailsQueryDTO();
+            dto.setBookId(detail.getBookId());
+            dto.setQuantity(detail.getQuantity());
+            dto.setSubTotal(detail.getSubTotal());
+            return dto;
+        }).collect(Collectors.toList());
+
+        orderQueryDTO.setOrderDetails(detailsDTOs);
+
+        // envia para o QueryModel
+        messageProducer.sendOrderToQueryModel(orderQueryDTO);
 
         return order;
     }

@@ -1,7 +1,6 @@
 package com.ijse.bookstore.QueryModel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ijse.bookstore.QueryModel.entity.OrderQuery;
 import jakarta.persistence.*;
 import lombok.Data;
 
