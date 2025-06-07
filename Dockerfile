@@ -4,7 +4,7 @@ FROM maven:3.9.2-eclipse-temurin-17 AS build
 WORKDIR /app
 
 # Copia os ficheiros do projeto
-COPY . .
+COPY Projeto/Online-Book-Store-Spring-Boot/bookstoreb .
 
 # Compila o projeto sem correr os testes
 RUN mvn clean package -DskipTests

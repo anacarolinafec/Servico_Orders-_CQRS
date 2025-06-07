@@ -34,7 +34,7 @@ services:
       - order-network
 
   order-service:
-    build: .
+    build: Projeto/Online-Book-Store-Spring-Boot/bookstoreb
     profiles:
       - application
     container_name: order-service
